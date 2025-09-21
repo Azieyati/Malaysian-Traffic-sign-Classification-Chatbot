@@ -1,5 +1,10 @@
 # MALAYSIAN-ROAD-SIGN-RECOGNITION-CHATBOT-USING-Resnet-50-CNN
 
+## How to run the code
+1) Install all the necessary library packages (torch, telebot, PIL, torchvision)
+2) Run the code from main.py
+
+
 ## ABSTRACT
 Traffic signs are an important thing to provide information about what happens on the road while driving or walking. It also may cause an accident if the road user is not aware of traffic signs on the road. In another hand, tourists or international students who drive in Malaysia also may have the same problem and some of them maybe don’t understand the meaning of road signs in Malaysia. This project is to focus on detecting the traffic/road signs on the roadside using Convolution Neural Network with PyTorch. This is done by initially analyzing the requirements followed by designing the architecture, implementing, and testing the chatbot. In developing the chatbot, a CNN model is trained with pre-processed datasets to predict the recognition of the traffic/road signs. The recognition accuracy achieved higher than 90% recognition accuracies for traffic signs using Malaysia’s traffic sign data set. This system will help the driver to learn and get knowledge about the meaning of traffic signs. It seems like a simple problem but may have a significant impact on their lives and their environment if this problem is ignored. It is also easy to access the system because the user just needs to search for the "DRIEBIE" chatbot on Telegram and then can easily access and learn from there. Users don’t need to install additional software or hardware to get the system and it’s free for anyone who needs it. The system requires users to send an image of a traffic sign on the road as input, then the system will provide explanations, and instructions to help users to refer and make decisions.
 
