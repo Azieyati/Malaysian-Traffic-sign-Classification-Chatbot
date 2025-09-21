@@ -1,11 +1,12 @@
 import logging
 import os
-
 import torch
 import telebot
 from PIL import Image
 from torchvision import transforms
-from torchvision.models import resnet50, densenet121, vgg16
+import torch.nn.functional as F
+from torchvision.models import resnet50
+# other model: densenet121, vgg16
 
 # Create the Telegram bot
 bot = telebot.TeleBot('6135118251:AAETo4ZYabDbNDeUESmCEdvQO7FwzjAcATE')
@@ -17,22 +18,11 @@ logging.basicConfig(
     level=logging.INFO)
 
 # Initialize the model with pre-trained weights
-# model = resnet50(weights=None)
-# model.fc = torch.nn.Linear(2048, num_classes)  # Replace num_classes with the number of classes in your task
 model = resnet50(weights=None)
-model.fc = torch.nn.Linear(model.fc.in_features, num_classes)
-# number of classes in your task
-
-# original code
-# model.fc = torch.nn.Sequential(
-#     torch.nn.Linear(model.fc.in_features, 512),  # Adding a fully connected layer
-#     torch.nn.ReLU(),
-#     torch.nn.Dropout(p=0.5),  # Apply dropout with a dropout rate of 0.5
-#     torch.nn.Linear(512, num_classes)  # Output layer for your specific classification task
-# )
+model.fc = torch.nn.Linear(model.fc.in_features, num_classes) # the number of classes
 
 model.load_state_dict(
-    torch.load('C:/Users/USER/PycharmProjects/projectPSM1/pretrained_model.pth', map_location=torch.device('cpu')))
+    torch.load('/Users/phisoft/PycharmProjects/Malaysia-Traffic-sign-Classification-Chatbot-using-Resnet-50-CNN/pretrained_model.pth', map_location=torch.device('cpu')))
 model.eval()
 
 # Define the device
@@ -50,8 +40,6 @@ label_mapping = {
     6: 'Speed Limit 80',
     7: 'Traffic Light',
     8: 'U-turn',
-
-    # Add more label mappings as per your specific problem
 }
 
 # Define the image preprocessing steps
@@ -80,36 +68,37 @@ def greet(message):
     bot.reply_to(message, "Please send a photo of traffic signs...")
 
 
-# Just send a message to reply
+# /help instructions for user
 @bot.message_handler(commands=['help'])
 def hello(message):
     bot.send_message(
         message.chat.id,
-        "To identify a road sign, please follow these steps:\n\n"
-        "1) Capture a clear image of the road sign you want to identify.\n\n"
-        "2) Crop the image to focus specifically on the road sign, making sure to include the entire sign "
-        "within the cropped area.\n\n"
-        "3) Click the \"Send\" button to upload and submit your photo for analysis.\n\n\n"
-        "By following these steps, you can provide me with the necessary information to assist you in identifying the "
-        "type of road sign or provide any relevant information you may need about it.\n"
-        "Feel free to proceed with the steps, and I'll be ready to assist you further!"
-
+        "🛑 How to Use This Bot to Identify a Traffic Sign 🛑\n\n"
+        "Please follow these simple steps:\n\n"
+        "1️⃣ *Capture a clear photo* of the traffic sign you'd like me to identify.\n\n"
+        "2️⃣ *Crop the image* so that the traffic sign is clearly visible and centered in the frame. Avoid background distractions if possible.\n\n"
+        "3️⃣ *Send the photo here* in this chat. I will analyze it and provide you with the sign's type and relevant information.\n\n"
+        "📌 Tip: For best results, make sure the photo is taken in good lighting and not blurry.\n\n"
+        "Once you're ready, just upload the image, and I’ll take care of the rest! 😊"
     )
 
 
-@bot.message_handler()
+@bot.message_handler(func=lambda message: True, content_types=['text'])
 def errormessage(message):
-    if message.text.lower() == 'hello' or message.text == 'hey':
-        bot.send_message(message.chat.id, "Hello, have a good day. Please send a photo")
-    elif message.text.lower() == 'hi' or message.text == 'hai':
-        bot.send_message(message.chat.id, "Hi !, have a good day. Please send a photo")
-    elif message.text.lower() == 'bye' or message.text == 'goodbye' or message.text == 'good bye':
-        bot.send_message(message.chat.id, "Bye, Thank you! Please visit again")
-    elif message.text.lower() == 'help' or message.text == 'helps':
-        bot.send_message(message.chat.id, "My only purpose is to tell you what kind of road sign it is. Send a photo")
-    else:
-        bot.send_message(message.chat.id, 'I do not understand what you wrote...')
+    text = message.text.lower()
 
+    if text in ['hello', 'hey']:
+        bot.send_message(message.chat.id, "Hello! Hope you're having a great day. Please send a photo of a traffic sign you'd like me to analyze.")
+    elif text in ['hi', 'hai']:
+        bot.send_message(message.chat.id, "Hi there! I'm here to help you identify traffic signs. Please send a photo.")
+    elif text in ['bye', 'goodbye', 'good bye']:
+        bot.send_message(message.chat.id, "Goodbye! Thank you for using the bot. Stay safe and see you again soon.")
+    elif text in ['help', 'helps']:
+        bot.send_message(message.chat.id, "I'm here to identify traffic signs for you. Just send a clear and cropped image of the road sign, and I'll take care of the rest.")
+    elif text.startswith("/"):
+        bot.send_message(message.chat.id, "Sorry, I didn't recognize that command. Please type /help to see available options.")
+    else:
+        bot.send_message(message.chat.id, "I'm not sure what you mean. Please send a photo of a traffic sign or type /help for instructions.")
 
 # Handle all other messages.
 @bot.message_handler(func=lambda message: True, content_types=['audio', 'voice', 'video', 'document',
@@ -141,89 +130,90 @@ def handle_photo(message):
     input_image = Image.open(image_path)
     input_tensor = transform(input_image).unsqueeze(0)
 
-    # Perform inference using your PyTorch model
+    # Inference
     with torch.no_grad():
         outputs = model(input_tensor)
-        _, predicted_idx = torch.max(outputs, 1)
+        probabilities = F.softmax(outputs, dim=1)
+        confidence, predicted_idx = torch.max(probabilities, 1)
         predicted_label_idx = predicted_idx.item()
+        accuracy = confidence.item() * 100
 
-    # Map the predicted index to label text
     predicted_label = label_mapping.get(predicted_label_idx, 'Unknown')
 
-    # Send the predicted label back to the user
-    bot.reply_to(message, f"Traffic sign : {predicted_label} sign.")
+    # Send result photo with prediction and accuracy
+    with open(image_path, 'rb') as photo:
+        bot.send_photo(
+            chat_id=message.chat.id,
+            photo=photo,
+            caption=f"🔍 *Prediction Result*\n"
+                    f"🚦 Traffic Sign: *{predicted_label}*\n"
+                    f"🎯 Accuracy: *{accuracy:.2f}%*",
+            parse_mode="Markdown"
+        )
 
-    # Condition check
-    if predicted_label_idx == 0:
-        bot.reply_to(message, f"This sign is typically placed on overhead gantries or road signs ahead of a junction "
-                              f"or interchange where traffic lanes split into separate directions."
-                              f" It serves as an advance warning to drivers")
-        bot.send_message(message.chat.id, f"Follow this instructions : \n"
-                                          f"1) You need to choose the appropriate lane to follow their desired route\n"
-                                          f"2) Avoid last-minute lane changes or confusion.")
-    elif predicted_label_idx == 1:
-        bot.reply_to(message, f"This sign is a downward-pointing triangle with a red border and white background. ")
-        bot.send_message(message.chat.id, f"Follow this instructions :\n"
-                                          f"1) Indicates that drivers approaching the sign must yield to other vehicles"
-                                          f"on the intersecting road.")
-    elif predicted_label_idx == 2:
-        bot.reply_to(message, f"The Height 5 Meters sign is typically placed near low clearance areas, such as "
-                              f"bridges, tunnels, or underpasses, where the vertical clearance is limited to 5 "
-                              f"meters. The purpose of this sign is to alert drivers of vehicles that exceed this "
-                              f"height restriction, ensuring they are aware of the potential hazard and can take "
-                              f"appropriate measures to avoid entering the area.")
-        bot.send_message(message.chat.id, f"Follow this instruction:\n"
-                                          f"1) Only vehicle has the higher not exceed than 5 meters can entering "
-                                          f"the area")
-    elif predicted_label_idx == 3:
-        bot.reply_to(message, f"The Hump Sign serves as a warning to drivers to slow down and be prepared to encounter "
-                              f"a raised section of the road designed to slow down vehicle speed. Road humps are "
-                              f"typically installed in areas where traffic calming measures are implemented "
-                              f"such as residential areas, school zones, or areas with high pedestrian "
-                              f"activity.")
-        bot.send_message(message.chat.id, "Follow this instruction :\n"
-                                          "1) Reduce your speed to safely navigate the road hump \n"
-                                          "note: Speeding your car may cause damage to your vehicle")
-    elif predicted_label_idx == 4:
-        bot.reply_to(message, f"This sign is a red circle with a white border and a black symbol of a stopped "
-                              f"vehicle. It indicates that stopping is prohibited in the designated area, even for a "
-                              f"short duration.")
-        bot.send_message(message.chat.id, "Follow this instruction:\n"
-                                          "1) When you found this sign board, you are not allowed to stop your car"
-                                          "even in the short time")
-    elif predicted_label_idx == 5:
-        bot.reply_to(message, f"The Obstruction Sign in Malaysia is a rectangular sign with a white background and a "
-                              f"red border. It features a black symbol of an object obstructing the road, such as "
-                              f"a fallen tree or a large rock. This sign indicates the presence of an obstruction on"
-                              f"  the road ahead.")
-        bot.reply_to(message, "Warning :\n"
-                              "Be careful, obstruction on the road ahead")
-    elif predicted_label_idx == 6:
-        bot.reply_to(message, f"The Speed Limit 80 Sign in Malaysia is a circular sign with a white background and a "
-                              f"red border. It features the number \"80\" in black, indicating the maximum speed "
-                              "limit in kilometers per hour (km/h) for "
-                              "that particular section of the road.")
-        bot.reply_to(message, f"Instruction:\n"
-                              f"The Speed Limit 80 Sign signifies that the maximum permitted speed for vehicles in "
-                              f"that area is 80 km/h.")
-    elif predicted_label_idx == 7:
-        bot.reply_to(message, f"This sign is a white rectangle with a black border and the symbol of a traffic light. "
-                              f"It indicates that a traffic light-controlled intersection is ahead.")
-        bot.send_message(message.chat.id, "Instruction:\n"
-                                          "1) Slow down your car\n"
-                                          "2) Stop when the traffic light is RED color, and move when its GREEN")
-    elif predicted_label_idx == 8:
-        bot.reply_to(message, f"The U-turn Sign indicates the location or direction where drivers are allowed to make "
-                              f"a U-turn on the road. A U-turn is a maneuver where a vehicle turns around to travel "
-                              f"in the opposite direction. This sign is typically placed at intersections or specific "
-                              f"locations where U-turns are permitted.")
-        bot.send_message(message.chat.id, "Instruction:\n"
-                                          "1) Take a lane from the far left lane on your side\n"
-                                          "2) Give a left turn signal. Then, stop and check for oncoming traffic,"
-                                          "vehicle\n"
-                                          "3) Complete the U-turn in the right lane traveling in the opposite "
-                                          "direction\n")
+    if accuracy < 50:
+        bot.send_message(message.chat.id,
+                         "⚠️ I'm not very confident about this prediction. "
+                         "Please try sending a clearer or more cropped image for better accuracy.")
+    elif accuracy > 50:
+        # Condition check
+        if predicted_label_idx == 0:
+            bot.reply_to(message,
+                         "Hey there! 👋 This sign usually appears above the road or near junctions where lanes split. It's giving drivers a heads-up about which lane to take. 🚗")
+            bot.send_message(message.chat.id, "👉 What you should do:\n"
+                                              "• Pick the correct lane early based on your direction.\n"
+                                              "• Avoid sudden lane changes — stay safe!")
 
+        elif predicted_label_idx == 1:
+            bot.reply_to(message,
+                         "This is a *Yield* sign! ⛔ It’s a red triangle pointing downward — it means you need to slow down and be ready to give way.")
+            bot.send_message(message.chat.id, "👉 What you should do:\n"
+                                              "• Slow down.\n"
+                                              "• Let other vehicles pass if needed before you go.")
+
+        elif predicted_label_idx == 2:
+            bot.reply_to(message,
+                         "Whoa! 🚧 This sign means there's a height restriction ahead — 5 meters max. Usually found near tunnels, bridges, or overhead barriers.")
+            bot.send_message(message.chat.id, "👉 What you should do:\n"
+                                              "• Make sure your vehicle isn’t taller than 5m.\n"
+                                              "• If it is — take another route to avoid any bumps (literally!).")
+
+        elif predicted_label_idx == 3:
+            bot.reply_to(message, "Heads up! 🛑 That’s a speed bump warning sign — it means a road hump is coming up.")
+            bot.send_message(message.chat.id, "👉 What you should do:\n"
+                                              "• Slow down.\n"
+                                              "• Drive over it gently to protect your vehicle and passengers.")
+
+        elif predicted_label_idx == 4:
+            bot.reply_to(message,
+                         "Oops — no stopping here! 🚫 This sign means you're not allowed to stop your car in that zone, not even for a second.")
+            bot.send_message(message.chat.id, "👉 What you should do:\n"
+                                              "• Keep driving — stopping could block traffic or cause danger.")
+
+        elif predicted_label_idx == 5:
+            bot.reply_to(message,
+                         "Caution! ⚠️ That’s an obstruction warning sign. Something might be in your lane ahead, like a rock or fallen tree.")
+            bot.send_message(message.chat.id, "👉 What you should do:\n"
+                                              "• Stay alert and slow down.\n"
+                                              "• Be ready to steer around safely.")
+
+        elif predicted_label_idx == 6:
+            bot.reply_to(message, "Zoom zoom... but not too fast! 🏁 This sign means the speed limit is 80 km/h.🚗")
+            bot.send_message(message.chat.id, "👉 What you should do:\n"
+                                              "• Keep your speed at or below 80 km/h — safety first!")
+
+        elif predicted_label_idx == 7:
+            bot.reply_to(message,
+                         "🚦 Traffic light ahead! This sign is telling you to watch out for signal lights controlling the intersection.")
+            bot.send_message(message.chat.id, "👉 What you should do:\n"
+                                              "• Start slowing down.\n"
+                                              "• Obey the lights — red means stop, green means go!")
+
+        elif predicted_label_idx == 8:
+            bot.reply_to(message, "Making a U-turn? 🔄 This sign says you're allowed to make one here.")
+            bot.send_message(message.chat.id, "👉 What you should do:\n"
+                                              "• Use the correct lane.\n"
+                                              "• Signal, wait for a safe gap, then make your turn carefully.")
     # Delete the local image file
     os.remove(image_path)
 
