@@ -91,19 +91,23 @@ Send `/start` to begin, then `/Signboard` to start sign recognition. Upload a cr
 
 Successfully recognized traffic light signs and provided real-time guidance. Demonstrated high accuracy and responsiveness in realistic traffic scenarios.
 
-![Test Case 1](images/testcase1.png)
+<img width="355" height="424" alt="testcase1" src="https://github.com/user-attachments/assets/88866bf3-44eb-41e9-bd8b-4a9595942755" />
+
+
 
 ### Test Case 2: Uncertain Prediction Handling
 
 Provided traffic sign predictions with confidence scores and guided users to improve input when accuracy was low, ensuring a reliable experience.
 
-![Test Case 2](images/testcase2.png)
+<img width="355" height="424" alt="testcase2" src="https://github.com/user-attachments/assets/3ead58dc-066d-4822-aad0-d40a4f0b8e38" />
+
 
 ### Test Case 3: Handling Noisy or Partial Images
 
 Successfully predicted traffic signs from noisy or partially captured images, returning confidence scores (e.g., Speed Limit 80 - Accuracy: 71.03%) with friendly guidance.
 
-![Test Case 3](images/testcase3.png)
+<img width="355" height="424" alt="testcase3" src="https://github.com/user-attachments/assets/fa472136-6335-44c9-9469-e8b50a68a000" />
+
 
 ---
 
