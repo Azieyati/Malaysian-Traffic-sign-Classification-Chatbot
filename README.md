@@ -12,16 +12,7 @@ A Telegram chatbot powered by ResNet-50 CNN that classifies Malaysian traffic si
 
 ## Project Overview
 
-Traffic signs provide essential information about road conditions while driving or walking. Misunderstanding them can lead to accidents, particularly for tourists or international students unfamiliar with Malaysian road signs.
-
-**DRIBIE** is a Telegram chatbot that detects and classifies Malaysian traffic signs using a Convolutional Neural Network (CNN) built with PyTorch. Users send an image of a traffic sign, and the bot returns:
-
-- The type of traffic sign detected
-- A confidence score
-- A detailed explanation of the sign's meaning
-- Actionable instructions for the driver
-
-The system achieves over 90% recognition accuracy and is accessible via Telegram with no additional software or hardware required.
+**DRIBIE** is a Telegram chatbot that detects and classifies Malaysian traffic signs using a Convolutional Neural Network (CNN) built with PyTorch. Users send an image of a traffic sign, and the bot returns the sign type, confidence score, explanation, and actionable instructions. The system achieves over 90% recognition accuracy with no additional software or hardware required.
 
 ---
 
@@ -35,14 +26,7 @@ The system achieves over 90% recognition accuracy and is accessible via Telegram
 | Models Evaluated | ResNet-50, DenseNet121, VGG-16 |
 | Chatbot Platform | Telegram Bot API (pyTelegramBotAPI) |
 | Image Processing | Pillow (PIL) |
-| Preprocessing | Resize (224x224), Random Flip, Random Rotation, Normalization |
 | Number of Classes | 9 Malaysian traffic sign categories |
-
-### Model Architecture
-
-- **Base Model:** ResNet-50 (pre-trained on ImageNet)
-- **Custom Head:** Fully connected layer mapping 2048 features to 9 classes
-- **Inference:** Softmax for probability distribution, argmax for label prediction
 
 ### Supported Traffic Signs
 
@@ -60,17 +44,6 @@ The system achieves over 90% recognition accuracy and is accessible via Telegram
 
 ---
 
-## Features
-
-- **Image Classification** — Send a photo of a traffic sign and receive instant recognition
-- **Detailed Explanations** — Understand what each sign means and how to respond
-- **Confidence Scoring** — View the model's confidence level for each prediction
-- **Low Confidence Warnings** — Get notified if image quality is insufficient
-- **Natural Conversation** — Responds to greetings and common commands
-- **Help System** — Built-in help command with usage instructions
-
----
-
 ## Installation
 
 ### Prerequisites
@@ -80,44 +53,29 @@ The system achieves over 90% recognition accuracy and is accessible via Telegram
 
 ### Steps
 
-1. **Clone the repository**
+```bash
+git clone https://github.com/Azieyati/Malaysian-Traffic-sign-Classification-Chatbot.git
+cd Malaysian-Traffic-sign-Classification-Chatbot
+pip install torch torchvision pyTelegramBotAPI Pillow
+```
 
-   ```bash
-   git clone https://github.com/Azieyati/Malaysian-Traffic-sign-Classification-Chatbot.git
-   cd Malaysian-Traffic-sign-Classification-Chatbot
-   ```
+Open `main.py` and replace the token:
 
-2. **Install dependencies**
+```python
+bot = telebot.TeleBot('YOUR_BOT_TOKEN_HERE')
+```
 
-   ```bash
-   pip install torch torchvision pyTelegramBotAPI Pillow
-   ```
+Run the bot:
 
-3. **Configure your bot token**
-
-   Open `main.py` and replace the token with your own:
-
-   ```python
-   bot = telebot.TeleBot('YOUR_BOT_TOKEN_HERE')
-   ```
-
-4. **Run the bot**
-
-   ```bash
-   python main.py
-   ```
+```bash
+python main.py
+```
 
 ---
 
 ## Usage
 
-1. Start a chat with the bot on Telegram
-2. Send `/start` to see available commands
-3. Send `/Signboard` to begin sign recognition mode
-4. Upload a cropped photo of a traffic sign
-5. Receive the prediction with sign type, accuracy, and explanation
-
-### Bot Commands
+Send `/start` to begin, then `/Signboard` to start sign recognition. Upload a cropped photo of a traffic sign to receive the prediction.
 
 | Command | Description |
 |---|---|
@@ -127,16 +85,36 @@ The system achieves over 90% recognition accuracy and is accessible via Telegram
 
 ---
 
+## Test Results
+
+### Test Case 1: Traffic Sign Recognition
+
+Successfully recognized traffic light signs and provided real-time guidance. Demonstrated high accuracy and responsiveness in realistic traffic scenarios.
+
+![Test Case 1](images/testcase1.png)
+
+### Test Case 2: Uncertain Prediction Handling
+
+Provided traffic sign predictions with confidence scores and guided users to improve input when accuracy was low, ensuring a reliable experience.
+
+![Test Case 2](images/testcase2.png)
+
+### Test Case 3: Handling Noisy or Partial Images
+
+Successfully predicted traffic signs from noisy or partially captured images, returning confidence scores (e.g., Speed Limit 80 - Accuracy: 71.03%) with friendly guidance.
+
+![Test Case 3](images/testcase3.png)
+
+---
+
 ## Model Performance
 
 ### Confusion Matrix
 
 ![Confusion Matrix](https://github.com/Azieyati/Malaysia-Traffic-sign-Classification-Chatbot-using-Resnet-50-CNN/assets/156404474/4454e4b9-d0db-4da6-bf48-9f8a8c7b5f52)
-
 ![Confusion Matrix 2](https://github.com/Azieyati/Malaysia-Traffic-sign-Classification-Chatbot-using-Resnet-50-CNN/assets/156404474/a2f4466f-1daa-4a3b-833d-c04ba4d3836e)
 
 ```
-Accuracy = correct_predictions / total_samples
 Accuracy = 95/95 x 100 = 100%
 ```
 
@@ -150,55 +128,19 @@ Accuracy = 95/95 x 100 = 100%
 
 ---
 
-## Project Structure
-
-```
-Malaysian-Traffic-sign-Classification-Chatbot/
-├── main.py                 # Telegram bot entry point
-├── pretrained_model.pth    # Pre-trained ResNet-50 weights
-├── df.png                  # Data flow diagram
-└── README.md               # Project documentation
-```
-
----
-
-## Objectives
-
-1. To identify the requirements for developing a road sign recognition chatbot.
-2. To develop a road sign recognition chatbot for Malaysian road signs.
-3. To test the performance of the chatbot using quantitative and qualitative methods.
-
----
-
-## Target Users
-
-### Newbie Drivers
-Individuals who have recently obtained their driver's license or have limited driving experience. They may lack confidence and knowledge in various aspects of driving, including road rules, traffic signs, and safe driving practices.
-
-### Tourists Who Drive in Malaysia
-Tourists who are studying or visiting Malaysia and choose to explore the country by driving. They may be unfamiliar with Malaysian roads, traffic regulations, and local driving customs.
-
----
-
-## Project Significance
-
-This project helps newbie drivers better understand the meaning of each traffic sign in an interactive way. It potentially:
-
-- Enhances road safety
-- Improves driver awareness
-- Contributes to a more efficient traffic system
-- Educates drivers who are less experienced or unfamiliar with certain traffic signs
-- Provides actionable explanations to empower safer driving decisions
-
-By leveraging computer vision and machine learning, this project addresses crucial aspects of traffic management, aiming to create safer, more informed, and more efficient road systems.
-
----
-
 ## Conclusion
 
-- The comparative analysis of three CNN models — ResNet-50, DenseNet, and VGG-16 — tested on real-world images with varying brightness, distance, and quality, reveals that ResNet-50 is the most suitable model for this project.
-- Comparison between public and custom datasets shows the custom dataset produces superior results.
-- The DRIBIE chatbot, powered by the ResNet-50 deep learning model, achieves 100% accuracy across near and far objects, demonstrating the accuracy and versatility of the model.
+ResNet-50 outperformed DenseNet and VGG-16 in real-world testing, and the custom dataset produced superior results compared to public datasets. The DRIBIE chatbot achieves 100% accuracy across near and far objects, demonstrating the model's accuracy and versatility.
+
+---
+
+## License
+
+This project is licensed under the terms specified in the [LICENCE](LICENCE) file.
+
+- **Attribution Required** — Credit must be given to the original author (Azieyati) with a link back to the repository.
+- **No Modifications** — The source code must remain unaltered.
+- **Non-Commercial** — This software may not be used for commercial purposes.
 
 ---
 
