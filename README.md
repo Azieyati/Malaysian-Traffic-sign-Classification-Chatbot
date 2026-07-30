@@ -1,60 +1,205 @@
-# MALAYSIAN-ROAD-SIGN-RECOGNITION-CHATBOT-USING-Resnet-50-CNN
+# Malaysian Road Sign Recognition Chatbot (DRIBIE)
 
-## How to run the code
-1) Install all the necessary library packages (torch, telebot, PIL, torchvision)
-2) Run the code from main.py
+A Telegram chatbot powered by ResNet-50 CNN that classifies Malaysian traffic signs and provides real-time explanations to drivers.
 
+![Python](https://img.shields.io/badge/Python-3.8+-blue?logo=python&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-1.9+-ee4c2c?logo=pytorch&logoColor=white)
+![Telegram](https://img.shields.io/badge/Telegram-Bot-26A5E4?logo=telegram&logoColor=white)
+![ResNet](https://img.shields.io/badge/Model-ResNet--50-success)
+![Accuracy](https://img.shields.io/badge/Accuracy-100%25-brightgreen)
 
-## ABSTRACT
-Traffic signs are an important thing to provide information about what happens on the road while driving or walking. It also may cause an accident if the road user is not aware of traffic signs on the road. In another hand, tourists or international students who drive in Malaysia also may have the same problem and some of them maybe don’t understand the meaning of road signs in Malaysia. This project is to focus on detecting the traffic/road signs on the roadside using Convolution Neural Network with PyTorch. This is done by initially analyzing the requirements followed by designing the architecture, implementing, and testing the chatbot. In developing the chatbot, a CNN model is trained with pre-processed datasets to predict the recognition of the traffic/road signs. The recognition accuracy achieved higher than 90% recognition accuracies for traffic signs using Malaysia’s traffic sign data set. This system will help the driver to learn and get knowledge about the meaning of traffic signs. It seems like a simple problem but may have a significant impact on their lives and their environment if this problem is ignored. It is also easy to access the system because the user just needs to search for the "DRIEBIE" chatbot on Telegram and then can easily access and learn from there. Users don’t need to install additional software or hardware to get the system and it’s free for anyone who needs it. The system requires users to send an image of a traffic sign on the road as input, then the system will provide explanations, and instructions to help users to refer and make decisions.
+---
 
-## INTRODUCTION
-Road signs are visual symbols or markings placed along roadways to provide information, guidance, and warnings to drivers, pedestrians, and other road users. They play an important role in ensuring safety and promoting efficient traffic flow. Road signs convey various types of information, such as regulatory instructions, warnings of potential hazards, guidance for directions, and important information about the road and its surroundings. It is important to familiarize yourself with the meaning of different road signs and their implications to avoid accidents. Moreover, road signs are like a language that the road wants to convey to drivers which gives relevant information on when to turn, street names, routes, directions, and warning for drivers. This road sign also helps drivers to keep them safe while driving. Without the knowledge of road signs, they hardly recognize what happens in front of them and tend to cause rising accidents in those areas. Some drivers might not realize this, but the road and safety signs in Malaysia have different meanings and functions according to their shape, font size, signboard color, placement, and symbol (Asyraf, 2022) The purpose of CHATDRIBIE which is known as the Malaysian road sign classification system in Chatbot aims to provide important information and instructions to the road users and to accurately classify traffic signs based on their visual content. This classification system enables the chatbot to provide users with relevant information, guidance, and assistance related to specific traffic signs. Furthermore, this system also focuses on helping road users who are still new in driving and doesn’t remember the meaning of road symbol it is also useful for tourist who drives in Malaysia so that they can better understand the meaning of the road signs. The chatbot will require users to send an image of road signs then it will explain in detail the meaning of the road signs and the instruction on what they should do.
+## Project Overview
 
+Traffic signs provide essential information about road conditions while driving or walking. Misunderstanding them can lead to accidents, particularly for tourists or international students unfamiliar with Malaysian road signs.
+
+**DRIBIE** is a Telegram chatbot that detects and classifies Malaysian traffic signs using a Convolutional Neural Network (CNN) built with PyTorch. Users send an image of a traffic sign, and the bot returns:
+
+- The type of traffic sign detected
+- A confidence score
+- A detailed explanation of the sign's meaning
+- Actionable instructions for the driver
+
+The system achieves over 90% recognition accuracy and is accessible via Telegram with no additional software or hardware required.
+
+---
+
+## Tech Stack
+
+| Category | Technology |
+|---|---|
+| Language | Python 3.8+ |
+| Deep Learning | PyTorch, torchvision |
+| Model Architecture | ResNet-50 (CNN) with custom classifier head |
+| Models Evaluated | ResNet-50, DenseNet121, VGG-16 |
+| Chatbot Platform | Telegram Bot API (pyTelegramBotAPI) |
+| Image Processing | Pillow (PIL) |
+| Preprocessing | Resize (224x224), Random Flip, Random Rotation, Normalization |
+| Number of Classes | 9 Malaysian traffic sign categories |
+
+### Model Architecture
+
+- **Base Model:** ResNet-50 (pre-trained on ImageNet)
+- **Custom Head:** Fully connected layer mapping 2048 features to 9 classes
+- **Inference:** Softmax for probability distribution, argmax for label prediction
+
+### Supported Traffic Signs
+
+| Label | Sign |
+|---|---|
+| 0 | Diverge |
+| 1 | Give Way |
+| 2 | Height 5 Meters |
+| 3 | Hump |
+| 4 | No Stopping |
+| 5 | Obstruction |
+| 6 | Speed Limit 80 |
+| 7 | Traffic Light |
+| 8 | U-turn |
+
+---
+
+## Features
+
+- **Image Classification** — Send a photo of a traffic sign and receive instant recognition
+- **Detailed Explanations** — Understand what each sign means and how to respond
+- **Confidence Scoring** — View the model's confidence level for each prediction
+- **Low Confidence Warnings** — Get notified if image quality is insufficient
+- **Natural Conversation** — Responds to greetings and common commands
+- **Help System** — Built-in help command with usage instructions
+
+---
+
+## Installation
+
+### Prerequisites
+
+- Python 3.8 or higher
+- A Telegram Bot Token (from [@BotFather](https://t.me/BotFather))
+
+### Steps
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/Azieyati/Malaysian-Traffic-sign-Classification-Chatbot.git
+   cd Malaysian-Traffic-sign-Classification-Chatbot
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   pip install torch torchvision pyTelegramBotAPI Pillow
+   ```
+
+3. **Configure your bot token**
+
+   Open `main.py` and replace the token with your own:
+
+   ```python
+   bot = telebot.TeleBot('YOUR_BOT_TOKEN_HERE')
+   ```
+
+4. **Run the bot**
+
+   ```bash
+   python main.py
+   ```
+
+---
+
+## Usage
+
+1. Start a chat with the bot on Telegram
+2. Send `/start` to see available commands
+3. Send `/Signboard` to begin sign recognition mode
+4. Upload a cropped photo of a traffic sign
+5. Receive the prediction with sign type, accuracy, and explanation
+
+### Bot Commands
+
+| Command | Description |
+|---|---|
+| `/start` | Start the bot and see options |
+| `/Signboard` | Begin traffic sign recognition |
+| `/help` | Show usage instructions |
+
+---
+
+## Model Performance
+
+### Confusion Matrix
+
+![Confusion Matrix](https://github.com/Azieyati/Malaysia-Traffic-sign-Classification-Chatbot-using-Resnet-50-CNN/assets/156404474/4454e4b9-d0db-4da6-bf48-9f8a8c7b5f52)
+
+![Confusion Matrix 2](https://github.com/Azieyati/Malaysia-Traffic-sign-Classification-Chatbot-using-Resnet-50-CNN/assets/156404474/a2f4466f-1daa-4a3b-833d-c04ba4d3836e)
+
+```
+Accuracy = correct_predictions / total_samples
+Accuracy = 95/95 x 100 = 100%
+```
+
+### Model Comparison
+
+![Model Comparison](https://github.com/Azieyati/Malaysia-Traffic-sign-Classification-Chatbot-using-Resnet-50-CNN/assets/156404474/bbb1fcae-195a-432f-8346-7e3f412d8f65)
+
+### Real-World Image Results
+
+![Real-World Results](https://github.com/Azieyati/Malaysia-Traffic-sign-Classification-Chatbot-using-Resnet-50-CNN/assets/156404474/c6d3c6e8-9e52-49db-8bb1-fc473474d391)
+
+---
+
+## Project Structure
+
+```
+Malaysian-Traffic-sign-Classification-Chatbot/
+├── main.py                 # Telegram bot entry point
+├── pretrained_model.pth    # Pre-trained ResNet-50 weights
+├── df.png                  # Data flow diagram
+└── README.md               # Project documentation
+```
+
+---
 
 ## Objectives
-This project embarks on the following objectives:
+
 1. To identify the requirements for developing a road sign recognition chatbot.
 2. To develop a road sign recognition chatbot for Malaysian road signs.
 3. To test the performance of the chatbot using quantitative and qualitative methods.
 
-## Target user:
-- Newbie drivers
-Newbie drivers refer to individuals who have recently obtained their 
-driver's license or have limited driving experience. They may lack confidence and knowledge in various aspects of driving, including road rules, traffic signs, and 
- safe driving practices.
-- Tourist who drives in Malaysia
-This user group consists of tourists who are studying or just visiting Malaysia and choose to explore the country by driving. They may be unfamiliar with Malaysian roads, traffic regulations, and local driving customs.
+---
 
+## Target Users
+
+### Newbie Drivers
+Individuals who have recently obtained their driver's license or have limited driving experience. They may lack confidence and knowledge in various aspects of driving, including road rules, traffic signs, and safe driving practices.
+
+### Tourists Who Drive in Malaysia
+Tourists who are studying or visiting Malaysia and choose to explore the country by driving. They may be unfamiliar with Malaysian roads, traffic regulations, and local driving customs.
+
+---
 
 ## Project Significance
-This project is focusing on helping the newbie driver to better understand the meaning of each traffic/road sign in a different way. It also potentially enhances road safety, improves driver awareness, and contributes to a more efficient and organized traffic system. In addition, the project also contributes to the education and awareness of drivers, particularly those who are less experienced or unfamiliar with certain traffic signs. The chatbot can provide explanations, and instructions to help users to refer and make decisions, empowering them to become safer and more informed drivers. As a result, by leveraging the power of computer vision and machine learning, the project addresses crucial aspects of traffic management, aiming to create safer, more informed, and more efficient systems.
 
+This project helps newbie drivers better understand the meaning of each traffic sign in an interactive way. It potentially:
 
-## Use-case Diagram
-![image](https://github.com/Azieyati/Malaysia-Traffic-sign-Classification-Chatbot-using-Resnet-50-CNN/assets/156404474/dbf3c261-596d-4205-9b30-e3bf0eb3df23)
+- Enhances road safety
+- Improves driver awareness
+- Contributes to a more efficient traffic system
+- Educates drivers who are less experienced or unfamiliar with certain traffic signs
+- Provides actionable explanations to empower safer driving decisions
 
-## Confusion Matrix
+By leveraging computer vision and machine learning, this project addresses crucial aspects of traffic management, aiming to create safer, more informed, and more efficient road systems.
 
-![image](https://github.com/Azieyati/Malaysia-Traffic-sign-Classification-Chatbot-using-Resnet-50-CNN/assets/156404474/4454e4b9-d0db-4da6-bf48-9f8a8c7b5f52)
-
-
-![image](https://github.com/Azieyati/Malaysia-Traffic-sign-Classification-Chatbot-using-Resnet-50-CNN/assets/156404474/a2f4466f-1daa-4a3b-833d-c04ba4d3836e)
-
-#### Accuracy = correct_predictions / total_samples
-#### Accuracy = 95/95*100 = 100%
-
-
-## Comparison other CNN model
-![image](https://github.com/Azieyati/Malaysia-Traffic-sign-Classification-Chatbot-using-Resnet-50-CNN/assets/156404474/bbb1fcae-195a-432f-8346-7e3f412d8f65)
-
-
-## Comparison result using real-world image
-
-![image](https://github.com/Azieyati/Malaysia-Traffic-sign-Classification-Chatbot-using-Resnet-50-CNN/assets/156404474/c6d3c6e8-9e52-49db-8bb1-fc473474d391)
+---
 
 ## Conclusion
-- The comparative analysis of three CNN models, Resnet-50, DenseNet, and VGG-16, when tested on real-world images characterized by differences in brightness, distance, and image quality, reveals that Resnet-50 emerges as the most suitable model for the project. 
-- Meanwhile the comparison between public dataset and custom dataset show the custom dataset produce the best result than the public dataset.
-- In summary, the DRIBIE chatbot, powered by the Resnet-50 deep learning model, has achieved an incredible 100% accuracy rate across near and far objects. This remarkable success demonstrates the accuracy and versatility of the model, laying the foundation for exciting future applications.
 
+- The comparative analysis of three CNN models — ResNet-50, DenseNet, and VGG-16 — tested on real-world images with varying brightness, distance, and quality, reveals that ResNet-50 is the most suitable model for this project.
+- Comparison between public and custom datasets shows the custom dataset produces superior results.
+- The DRIBIE chatbot, powered by the ResNet-50 deep learning model, achieves 100% accuracy across near and far objects, demonstrating the accuracy and versatility of the model.
+
+---
+
+&copy; 2026 Azieyati. All rights reserved.
